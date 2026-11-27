@@ -1,20 +1,62 @@
 let officeData = null;
 let selectedMention = '@자비스';
 let selectedAgent = null;
+let motionEnabled = true;
 
 const LOCAL_CHAT_KEY = 'hanmiru_local_chats_v1';
 const LOCAL_MEMO_KEY = 'hanmiru_local_memos_v1';
+const LOCAL_WORKING_KEY = 'hanmiru_working_agents_v1';
 const GH_TOKEN_KEY = 'hanmiru_gh_token_v1';
 const GH_REPO = 'yileet22-ui/-';
+
+// 방 이동용 웨이포인트 (대회의실, 지휘실, 생활실, 해상실, 라운지)
+const WORK_SPOTS = [
+  { top: '34%', left: '24%' }, // 대회의실
+  { top: '27%', left: '49%' }, // 지휘실
+  { top: '52%', left: '40%' }, // 생활실
+  { top: '47%', left: '67%' }, // 해상실
+  { top: '71%', left: '72%' }  // 라운지/부동산실
+];
 
 async function loadData() {
   try {
     const res = await fetch(`./data.json?t=${Date.now()}`);
-    officeData = await res.json();
+    const newData = await res.json();
+    if (officeData && officeData.updatedAt !== newData.updatedAt) {
+      // 서버(data.json)가 새로 갱신되면 로컬 작업중 표시 초기화
+      localStorage.removeItem(LOCAL_WORKING_KEY);
+    }
+    officeData = newData;
     renderAll();
   } catch (e) {
     showToast('데이터를 불러오는 중 문제가 생겼어요.');
   }
+}
+
+function getWorkingMap() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(LOCAL_WORKING_KEY) || '{}');
+    const now = Date.now();
+    const cleaned = {};
+    for (const [k, ts] of Object.entries(raw)) {
+      if (now - ts < 6 * 60 * 1000) cleaned[k] = ts;
+    }
+    return cleaned;
+  } catch {
+    return {};
+  }
+}
+
+function markAgentWorking(text) {
+  const map = getWorkingMap();
+  const targets = [];
+  if (text.includes('@마루')) targets.push('maru');
+  if (text.includes('@마린이')) targets.push('marine');
+  if (text.includes('@부캉이')) targets.push('bukang');
+  if (text.includes('@자비스') || targets.length === 0) targets.push('jarvis');
+  const now = Date.now();
+  targets.forEach((id) => { map[id] = now; });
+  localStorage.setItem(LOCAL_WORKING_KEY, JSON.stringify(map));
 }
 
 function renderAll() {
@@ -46,12 +88,17 @@ function renderKeyStatus() {
 function renderOfficePins() {
   const container = document.getElementById('office-pins');
   container.innerHTML = '';
+  const workingMap = getWorkingMap();
+
   officeData.agents.forEach((agent) => {
+    const isWorking = Boolean(workingMap[agent.id]) || agent.status === '작업중';
     const pin = document.createElement('div');
-    pin.className = 'agent-pin';
+    pin.className = `agent-pin ${isWorking ? 'working' : ''}`;
+    pin.dataset.agentId = agent.id;
     pin.style.top = agent.position.top;
     pin.style.left = agent.position.left;
     pin.innerHTML = `
+      ${isWorking ? '<div class="agent-work-badge">⚡ 작업중...</div>' : ''}
       <div class="agent-room-pill">${agent.emoji} ${agent.room}</div>
       <div class="agent-avatar-wrap">
         <img src="${agent.avatar}" alt="${agent.name}" class="agent-avatar" />
@@ -61,6 +108,32 @@ function renderOfficePins() {
     `;
     pin.addEventListener('click', () => openAgentModal(agent));
     container.appendChild(pin);
+  });
+}
+
+// 캐릭터들이 오피스 맵 위를 살아 움직이게 이동
+function animateAgents() {
+  if (!officeData || !motionEnabled) return;
+  const workingMap = getWorkingMap();
+  document.querySelectorAll('.agent-pin').forEach((pin) => {
+    const id = pin.dataset.agentId;
+    const agent = officeData.agents.find((a) => a.id === id);
+    if (!agent) return;
+    const isWorking = Boolean(workingMap[id]) || agent.status === '작업중';
+    if (isWorking) {
+      // 일하는 비서는 대회의실·지휘실·자기 방을 바쁘게 오감
+      const spot = WORK_SPOTS[Math.floor(Math.random() * WORK_SPOTS.length)];
+      pin.style.top = spot.top;
+      pin.style.left = spot.left;
+    } else {
+      // 대기 중인 비서는 자기 방 근처에서 살짝씩 산책
+      const baseTop = parseFloat(agent.position.top);
+      const baseLeft = parseFloat(agent.position.left);
+      const dTop = (Math.random() - 0.5) * 6;
+      const dLeft = (Math.random() - 0.5) * 6;
+      pin.style.top = `${baseTop + dTop}%`;
+      pin.style.left = `${baseLeft + dLeft}%`;
+    }
   });
 }
 
@@ -110,7 +183,9 @@ function renderTasks() {
 function renderAgentGrid() {
   const grid = document.getElementById('agent-grid');
   grid.innerHTML = '';
+  const workingMap = getWorkingMap();
   officeData.agents.forEach((agent) => {
+    const isWorking = Boolean(workingMap[agent.id]) || agent.status === '작업중';
     const card = document.createElement('div');
     card.className = 'agent-card';
     card.innerHTML = `
@@ -118,7 +193,7 @@ function renderAgentGrid() {
       <div>
         <div class="agent-card-title">
           <span>${agent.name}</span>
-          <span class="agent-card-role">${agent.emoji} ${agent.room} · ${agent.role}</span>
+          <span class="agent-card-role">${agent.emoji} ${agent.room} · ${isWorking ? '⚡ 작업중' : agent.role}</span>
         </div>
         <div class="agent-card-task"><strong>현재:</strong> ${escapeHtml(agent.currentTask)}</div>
         <div class="agent-card-desc">${escapeHtml(agent.description)}</div>
@@ -147,8 +222,10 @@ function renderMemos() {
 
 function openAgentModal(agent) {
   selectedAgent = agent;
+  const workingMap = getWorkingMap();
+  const isWorking = Boolean(workingMap[agent.id]) || agent.status === '작업중';
   document.getElementById('modal-avatar').src = agent.avatar;
-  document.getElementById('modal-room').textContent = `${agent.emoji} ${agent.room} · ${agent.status}`;
+  document.getElementById('modal-room').textContent = `${agent.emoji} ${agent.room} · ${isWorking ? '⚡ 작업중' : agent.status}`;
   document.getElementById('modal-name').textContent = agent.name;
   document.getElementById('modal-role').textContent = agent.role;
   document.getElementById('modal-task').textContent = agent.currentTask;
@@ -184,7 +261,6 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// 이벤트 바인딩
 document.querySelectorAll('.tab-btn').forEach((btn) => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
@@ -221,9 +297,10 @@ document.getElementById('btn-style-clay').addEventListener('click', () => {
 
 document.getElementById('btn-motion').addEventListener('click', (e) => {
   const btn = e.currentTarget;
-  const on = btn.classList.toggle('active');
-  btn.textContent = on ? '✨ 움직임 ON' : '⏸️ 움직임 OFF';
-  document.getElementById('office-stage').classList.toggle('motion-on', on);
+  motionEnabled = btn.classList.toggle('active');
+  btn.textContent = motionEnabled ? '✨ 움직임 ON' : '⏸️ 움직임 OFF';
+  document.getElementById('office-stage').classList.toggle('motion-on', motionEnabled);
+  if (!motionEnabled) renderOfficePins();
 });
 
 document.getElementById('modal-close').addEventListener('click', closeAgentModal);
@@ -276,8 +353,12 @@ document.getElementById('chat-form').addEventListener('submit', async (e) => {
   const localChats = JSON.parse(localStorage.getItem(LOCAL_CHAT_KEY) || '[]');
   localChats.push({ id: Date.now(), sender: '창민님', agentId: 'user', time: timeStr, text });
   localStorage.setItem(LOCAL_CHAT_KEY, JSON.stringify(localChats));
+  markAgentWorking(text);
   input.value = '';
   renderChats();
+  renderOfficePins();
+  renderAgentGrid();
+  setTimeout(animateAgents, 150);
 
   try {
     const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/issues`, {
@@ -293,7 +374,7 @@ document.getElementById('chat-form').addEventListener('submit', async (e) => {
       })
     });
     if (resp.ok) {
-      showToast('✅ 비서실에 전달됐어요! (최대 5분 내 답변)');
+      showToast('✅ 비서실 전달 완료! 오피스 맵에서 일하는 모습을 확인해 보세요.');
     } else {
       showToast('⚠️ 키 확인이 필요해요. (권한 오류)');
     }
@@ -317,3 +398,4 @@ document.getElementById('memo-form').addEventListener('submit', (e) => {
 
 loadData();
 setInterval(loadData, 15000);
+setInterval(animateAgents, 3200);
