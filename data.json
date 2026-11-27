@@ -1,7 +1,7 @@
 {
   "officeName": "한미르호 비서실",
   "owner": "선장님 전용",
-  "updatedAt": "2026-11-27 18:39",
+  "updatedAt": "2026-11-27 18:57",
   "agents": [
     {
       "id": "jarvis",
@@ -10,9 +10,9 @@
       "room": "지휘실",
       "emoji": "🎯",
       "avatar": "./images/jarvis.png",
-      "status": "작업중",
+      "status": "가동중",
       "statusColor": "#22C55E",
-      "currentTask": "한미르호 비서실 웹페이지 운영",
+      "currentTask": "한미르호 비서실 운영 · 일정 통합 관리",
       "description": "전체 비서실 총괄, 매일 아침 브리핑, 주요 일정·메일 통합 관리",
       "position": { "top": "27%", "left": "49%" },
       "labelPosition": { "top": "18%", "left": "49%" }
@@ -52,9 +52,9 @@
       "room": "부동산실",
       "emoji": "🏢",
       "avatar": "./images/bukang.png",
-      "status": "가동중",
+      "status": "완료",
       "statusColor": "#22C55E",
-      "currentTask": "매일 10시 부산 · 명지 청약 공고 모니터링",
+      "currentTask": "서면 DS협성엘리시안 & 유사 단지 5곳 비교 완료",
       "description": "부산 전역 및 강서구 명지 분양·청약 공고 감시, 청약 조건·시세 분석",
       "position": { "top": "71%", "left": "72%" },
       "labelPosition": { "top": "62%", "left": "72%" }
@@ -63,12 +63,12 @@
   "tasks": [
     {
       "id": 1,
-      "agent": "자비스",
-      "agentId": "jarvis",
-      "title": "한미르호 비서실 웹페이지 구축",
-      "status": "진행중",
-      "time": "오늘",
-      "summary": "자비스·마루·마린이·부캉이 4인 오피스 맵 및 모바일 PWA 세팅"
+      "agent": "부캉이",
+      "agentId": "bukang",
+      "title": "서면 DS협성엘리시안 & 유사 매물 리스트업",
+      "status": "완료",
+      "time": "오늘 18:57",
+      "summary": "DS협성엘리시안(26평 3.07~3.3억) 분석 및 서면서한이다음·전포유림·스위트엠 등 5곳 비교 완료"
     },
     {
       "id": 2,
@@ -142,8 +142,8 @@
       "id": 4,
       "sender": "부캉이",
       "agentId": "bukang",
-      "time": "18:35",
-      "text": "부동산실 부캉이예요! 매일 오전 10시에 부산이랑 명지 청약 공고 빠짐없이 훑고 있습니다."
+      "time": "18:57",
+      "text": "부캉이 보고드립니다 🏢 서면 DS협성엘리시안(26평 매물 최저 3.15억)이랑 비슷한 서면서한이다음(최저 2.7억), 전포유림노르웨이숲(최저 3.3억), 서면스위트엠(최저 3.07억), 서면동일파크스위트3차(최저 3.65억)까지 5곳 정리 끝냈어요!"
     }
   ],
   "memos": [
