@@ -1,0 +1,21 @@
+{
+  "name": "한미르호 비서실",
+  "short_name": "한미르호",
+  "description": "창민님 전용 AI 비서실 — 자비스 · 마루 · 마린이 · 부캉이",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FAF5ED",
+  "theme_color": "#8B5A2B",
+  "icons": [
+    {
+      "src": "./images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

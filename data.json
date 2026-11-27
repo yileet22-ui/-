@@ -1,0 +1,166 @@
+{
+  "officeName": "한미르호 비서실",
+  "owner": "선장님 전용",
+  "updatedAt": "2026-11-27 18:39",
+  "agents": [
+    {
+      "id": "jarvis",
+      "name": "자비스",
+      "role": "총괄 비서",
+      "room": "지휘실",
+      "emoji": "🎯",
+      "avatar": "./images/jarvis.png",
+      "status": "작업중",
+      "statusColor": "#22C55E",
+      "currentTask": "한미르호 비서실 웹페이지 운영",
+      "description": "전체 비서실 총괄, 매일 아침 브리핑, 주요 일정·메일 통합 관리",
+      "position": { "top": "27%", "left": "49%" },
+      "labelPosition": { "top": "18%", "left": "49%" }
+    },
+    {
+      "id": "maru",
+      "name": "마루",
+      "role": "일상생활",
+      "room": "생활실",
+      "emoji": "🏠",
+      "avatar": "./images/maru.png",
+      "status": "대기중",
+      "statusColor": "#22C55E",
+      "currentTask": "장바구니 2건 · 월말 카드 마감 챙김",
+      "description": "쇼핑, 결제·카드 혜택, 서류·청구 일정, 예산·생활 민원 대행",
+      "position": { "top": "52%", "left": "40%" },
+      "labelPosition": { "top": "43%", "left": "40%" }
+    },
+    {
+      "id": "marine",
+      "name": "마린이",
+      "role": "승선 · 해상",
+      "room": "해상실",
+      "emoji": "⚓",
+      "avatar": "./images/marine.png",
+      "status": "대기중",
+      "statusColor": "#22C55E",
+      "currentTask": "항차 마무리 · 다음 승선 및 교육 체크",
+      "description": "승선 항차 일정, 연수원 교육, 선박·해운 자료 및 연락망 관리",
+      "position": { "top": "47%", "left": "67%" },
+      "labelPosition": { "top": "38%", "left": "67%" }
+    },
+    {
+      "id": "bukang",
+      "name": "부캉이",
+      "role": "부산 부동산",
+      "room": "부동산실",
+      "emoji": "🏢",
+      "avatar": "./images/bukang.png",
+      "status": "가동중",
+      "statusColor": "#22C55E",
+      "currentTask": "매일 10시 부산 · 명지 청약 공고 모니터링",
+      "description": "부산 전역 및 강서구 명지 분양·청약 공고 감시, 청약 조건·시세 분석",
+      "position": { "top": "71%", "left": "72%" },
+      "labelPosition": { "top": "62%", "left": "72%" }
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "agent": "자비스",
+      "agentId": "jarvis",
+      "title": "한미르호 비서실 웹페이지 구축",
+      "status": "진행중",
+      "time": "오늘",
+      "summary": "자비스·마루·마린이·부캉이 4인 오피스 맵 및 모바일 PWA 세팅"
+    },
+    {
+      "id": 2,
+      "agent": "마루",
+      "agentId": "maru",
+      "title": "태블릿 주변기기 장바구니 확인",
+      "status": "대기중",
+      "time": "오늘",
+      "summary": "키보드·마우스 2건 장바구니 담기 완료, 선장님 확인 대기"
+    },
+    {
+      "id": 3,
+      "agent": "마루",
+      "agentId": "maru",
+      "title": "월말 카드 실적 마감 챙김",
+      "status": "마감임박",
+      "time": "~11월 30일",
+      "summary": "월말 혜택 조건 유지를 위한 소액 결제 확인 필요"
+    },
+    {
+      "id": 4,
+      "agent": "마루",
+      "agentId": "maru",
+      "title": "12월 초 서류 재발급 일정",
+      "status": "예약됨",
+      "time": "12월 01일",
+      "summary": "오전 리마인더 및 캘린더 일정 등록 완료"
+    },
+    {
+      "id": 5,
+      "agent": "부캉이",
+      "agentId": "bukang",
+      "title": "부산 · 명지 청약 공고 일일 점검",
+      "status": "정기실행",
+      "time": "매일 10:00",
+      "summary": "부산 지역 신규 청약 및 분양 예고 매일 모니터링 중"
+    },
+    {
+      "id": 6,
+      "agent": "마린이",
+      "agentId": "marine",
+      "title": "비상연락망 대조 및 파일 정리",
+      "status": "완료",
+      "time": "완료",
+      "summary": "미저장 연락처 대조 및 저장용 파일 생성 완료"
+    }
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "sender": "자비스",
+      "agentId": "jarvis",
+      "time": "18:35",
+      "text": "선장님! 한미르호 비서실 세팅 완료했습니다. 지휘실에서 전체 일정과 브리핑을 총괄하고 있어요."
+    },
+    {
+      "id": 2,
+      "sender": "마루",
+      "agentId": "maru",
+      "time": "18:35",
+      "text": "생활실 마루입니다! 장바구니 2건이랑 월말 카드 마감 일정 챙기고 있어요."
+    },
+    {
+      "id": 3,
+      "sender": "마린이",
+      "agentId": "marine",
+      "time": "18:35",
+      "text": "해상실 마린이입니다 ⚓ 항차 마무리랑 다음 승선·교육 일정까지 보고 있습니다!"
+    },
+    {
+      "id": 4,
+      "sender": "부캉이",
+      "agentId": "bukang",
+      "time": "18:35",
+      "text": "부동산실 부캉이예요! 매일 오전 10시에 부산이랑 명지 청약 공고 빠짐없이 훑고 있습니다."
+    }
+  ],
+  "memos": [
+    {
+      "id": 1,
+      "tag": "마감",
+      "text": "11월 말까지 카드 실적 조건 체크 필요"
+    },
+    {
+      "id": 2,
+      "tag": "일정",
+      "text": "11월 30일·12월 1일 오전 일정 리마인더 등록됨"
+    },
+    {
+      "id": 3,
+      "tag": "정리",
+      "text": "클라우드 저장공간 정리 방식 결정 필요"
+    }
+  ]
+}
