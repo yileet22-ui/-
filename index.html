@@ -75,8 +75,18 @@
         <div class="section-card">
           <div class="section-head">
             <h3>💬 비서실 회의실</h3>
-            <span class="small-muted">@이름으로 지시하면 피클에 바로 전달할 수 있어요</span>
+            <button type="button" class="key-toggle-btn" id="btn-toggle-key">🔑 연결 설정</button>
           </div>
+          <div class="key-panel" id="key-panel" style="display:none;">
+            <div class="key-panel-title">실시간 양방향 연결 (1회만 입력)</div>
+            <p class="key-panel-desc">아래 링크에서 맨 아래 <strong>Generate token</strong>을 누르고 나온 키(<code>ghp_...</code>)를 붙여 넣어 주세요.</p>
+            <a class="key-link-btn" href="https://github.com/settings/tokens/new?description=hanmiru&scopes=public_repo" target="_blank" rel="noopener">🔗 1초 만에 연결 키 만들기</a>
+            <div class="key-form">
+              <input type="password" id="gh-token-input" placeholder="ghp_... 키 붙여넣기" autocomplete="off" />
+              <button type="button" class="send-btn" id="btn-save-key">저장</button>
+            </div>
+          </div>
+          <div class="key-status-bar" id="key-status-bar"></div>
           <div class="chat-list" id="chat-list"></div>
           <div class="mention-bar" id="mention-bar">
             <button class="mention-chip active" data-mention="@자비스">@자비스</button>
@@ -88,7 +98,7 @@
             <input type="text" id="chat-input" placeholder="예: @부캉이 명지 청약 새 공고 확인해줘" autocomplete="off" />
             <button type="submit" class="send-btn">전송</button>
           </form>
-          <p class="helper-note">💡 전송하면 회의실에 기록되고, 클립보드에 자동 복사돼 피클 채팅에 바로 붙여넣을 수 있어요.</p>
+          <p class="helper-note" id="chat-helper-note">💡 전송하면 비서실로 바로 전달되고, 최대 5분 안에 담당 비서가 일하고 답장을 달아줘요.</p>
         </div>
       </section>
 

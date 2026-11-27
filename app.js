@@ -4,6 +4,8 @@ let selectedAgent = null;
 
 const LOCAL_CHAT_KEY = 'hanmiru_local_chats_v1';
 const LOCAL_MEMO_KEY = 'hanmiru_local_memos_v1';
+const GH_TOKEN_KEY = 'hanmiru_gh_token_v1';
+const GH_REPO = 'yileet22-ui/-';
 
 async function loadData() {
   try {
@@ -19,10 +21,26 @@ function renderAll() {
   if (!officeData) return;
   document.getElementById('last-updated-chip').textContent = `🕒 ${officeData.updatedAt}`;
   renderOfficePins();
+  renderKeyStatus();
   renderChats();
   renderTasks();
   renderAgentGrid();
   renderMemos();
+}
+
+function renderKeyStatus() {
+  const token = localStorage.getItem(GH_TOKEN_KEY);
+  const bar = document.getElementById('key-status-bar');
+  const btn = document.getElementById('btn-toggle-key');
+  if (token) {
+    bar.innerHTML = '🟢 실시간 양방향 연결됨 · 채팅 치면 최대 5분 내 자동 응답';
+    bar.style.color = '#15803D';
+    btn.textContent = '🔑 연결됨';
+  } else {
+    bar.innerHTML = '⚪ 아직 연결 키가 없어요 (오른쪽 위 <b>🔑 연결 설정</b>을 눌러 입력해 주세요)';
+    bar.style.color = '#92400E';
+    btn.textContent = '🔑 연결 설정';
+  }
 }
 
 function renderOfficePins() {
@@ -155,7 +173,7 @@ function showToast(msg) {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2300);
+  setTimeout(() => toast.classList.remove('show'), 2600);
 }
 
 function escapeHtml(str) {
@@ -169,6 +187,24 @@ function escapeHtml(str) {
 // 이벤트 바인딩
 document.querySelectorAll('.tab-btn').forEach((btn) => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+document.getElementById('btn-toggle-key').addEventListener('click', () => {
+  const panel = document.getElementById('key-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('btn-save-key').addEventListener('click', () => {
+  const val = document.getElementById('gh-token-input').value.trim();
+  if (!val) {
+    showToast('키를 입력해 주세요.');
+    return;
+  }
+  localStorage.setItem(GH_TOKEN_KEY, val);
+  document.getElementById('gh-token-input').value = '';
+  document.getElementById('key-panel').style.display = 'none';
+  renderKeyStatus();
+  showToast('연결 키가 저장됐어요! 이제 채팅을 보내 보세요.');
 });
 
 document.getElementById('btn-style-basic').addEventListener('click', () => {
@@ -227,6 +263,14 @@ document.getElementById('chat-form').addEventListener('submit', async (e) => {
   const raw = input.value.trim();
   if (!raw) return;
   const text = raw.startsWith('@') ? raw : `${selectedMention} ${raw}`;
+  const token = localStorage.getItem(GH_TOKEN_KEY);
+
+  if (!token) {
+    document.getElementById('key-panel').style.display = 'block';
+    showToast('먼저 연결 키를 입력해 주세요!');
+    return;
+  }
+
   const now = new Date();
   const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   const localChats = JSON.parse(localStorage.getItem(LOCAL_CHAT_KEY) || '[]');
@@ -234,11 +278,27 @@ document.getElementById('chat-form').addEventListener('submit', async (e) => {
   localStorage.setItem(LOCAL_CHAT_KEY, JSON.stringify(localChats));
   input.value = '';
   renderChats();
+
   try {
-    await navigator.clipboard.writeText(text);
-    showToast('회의실에 기록하고 문장을 복사했어요! 피클에 붙여넣기 하세요.');
+    const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/issues`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title: `[비서실] ${text.slice(0, 60)}`,
+        body: text
+      })
+    });
+    if (resp.ok) {
+      showToast('✅ 비서실에 전달됐어요! (최대 5분 내 답변)');
+    } else {
+      showToast('⚠️ 키 확인이 필요해요. (권한 오류)');
+    }
   } catch {
-    showToast('회의실에 기록됐어요!');
+    showToast('⚠️ 전송 중 네트워크 오류가 났어요.');
   }
 });
 
@@ -256,3 +316,4 @@ document.getElementById('memo-form').addEventListener('submit', (e) => {
 });
 
 loadData();
+setInterval(loadData, 15000);
